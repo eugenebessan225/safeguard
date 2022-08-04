@@ -65,14 +65,16 @@ fieldnames = [
 class TimesAndCounts(multiprocessing.Process):
 
 
-    def __init__(self, name, inQ, outQ):
+    def __init__(self, name, inQ, outQ, logQ):
         multiprocessing.Process.__init__(self)
         self.name = name
         self.time_window = 500
         self.inQ = inQ
         self.outQ = outQ
+        self.logQ = logQ
         self.cvar = windowcounts()
         self.current_time = 0
+        self.logfile = []
 
     def run(self):        
         pack_count = 0
@@ -179,11 +181,21 @@ class TimesAndCounts(multiprocessing.Process):
 
         #self.logger.debug("Received %s %s %s", ID, Prot1, services)
         # Adding or changing attributes
+        log={}
+
 
         if Prot1 == "tcp":
             cvar.bytes = cvar.bytes + int(
                 packet_dict["frame.len"]
             )
+            log["Time"] = packet_dict["frame.time"]
+            log["Protocol"] = "TCP"
+            if "ip.src" in packet_dict:
+                log["Source"] = packet_dict["ip.src.host"]
+                log["Destination"] = packet_dict["ip.dst.host"]
+            log["P_src"] = packet_dict["tcp.srcport"]
+            log["P_dst"] = packet_dict["tcp.dstport"]
+            self.logfile.append(log)
             self.count_services(services, cvar)
             cvar.num_tcp += 1
             self.accumulate_IDs(ID, cvar)
@@ -206,7 +218,14 @@ class TimesAndCounts(multiprocessing.Process):
             cvar.bytes = cvar.bytes + int(
                 packet_dict["frame.len"]
             )
-            
+            log["Time"] = packet_dict["frame.time"]
+            log["Protocol"] = "UDP"
+            if "ip.src" in packet_dict:
+                log["Source"] = packet_dict["ip.src.host"]
+                log["Destination"] = packet_dict["ip.dst.host"]
+            log["P_src"] = packet_dict["udp.srcport"]
+            log["P_dst"] = packet_dict["udp.dstport"]
+            self.logfile.append(log)
             self.count_services(services, cvar)
             cvar.num_udp += 1
             self.accumulate_IDs(ID, cvar)
@@ -286,6 +305,8 @@ class TimesAndCounts(multiprocessing.Process):
 
         
         self.send_data(data)
+        self.logQ.put(self.logfile)
+        self.logfile.clear()
 
     
     def send_data(self, record_for_csv):

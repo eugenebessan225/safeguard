@@ -1,4 +1,3 @@
-
 from ast import Try
 from distutils.log import debug
 from multiprocessing import Queue
@@ -18,6 +17,10 @@ from flask import Flask, render_template, jsonify, request
 from flask_socketio import SocketIO, emit, send
 from flask_cors import CORS
 import pika
+import logging
+import time
+
+ 
 
 
 fieldnames = [
@@ -45,23 +48,27 @@ fieldnames = [
 
 
 def predictor(inQ, ouQ):
-    with open('/home/bess225/Bureau/PFE/ext/ml2/scaler_encoder.pkl', 'rb') as scaler:
+
+    with open('/home/bess225/Bureau/PFE/safeguard/ml2/scaler_encoder.pkl', 'rb') as scaler:
         scal_pkl = pickle.load(scaler)
 
-    with open('/home/bess225/Bureau/PFE/ext/ml2/predictor.pkl', 'rb') as predictor:
+    with open('/home/bess225/Bureau/PFE/safeguard/ml2/predictor.pkl', 'rb') as predictor:
         model = pickle.load(predictor)
 
-    with open('/home/bess225/Bureau/PFE/ext/ml2/target_encoder.pkl', 'rb') as target:
+    with open('/home/bess225/Bureau/PFE/safeguard/ml2/target_encoder.pkl', 'rb') as target:
         predicted = pickle.load(target)
 
+
     channel.queue_declare(queue='prediction', durable=True)
+    channel.queue_declare(queue='trafic', durable=True)
 
     while True:
 
         if not inQ.empty():
             theData = inQ.get()
+            oth = ouQ.get()
             data0 = [theData[: -1]]
-            
+            pkt = str(theData[0])
             df = pd.DataFrame(np.array(data0), columns=fieldnames)
             # Transformation des données
             dataset = scal_pkl.transform(df)
@@ -73,13 +80,25 @@ def predictor(inQ, ouQ):
             data0 = data1[0]
             if data0[0] != None:
                 data = "".join(data0)
-                print(data)
+
+                if data == "Dos":
+                    moment=time.strftime("%Y-%b-%d__%H_%M_%S",time.localtime())
+                    # Create and configure logger
+                    logging.basicConfig(filename="log-"+moment+".log", 
+                                        format='%(asctime)s %(message)s',
+                                        filemode='w')
+                    # Creating an object
+                    logger = logging.getLogger()
+                    logger.setLevel(logging.INFO)
+                    for elmt in oth:
+                        elmt["event"] = "Dos"
+                        logger.info(str(elmt))
+                        db.logs.insert_one(elmt)
                 channel.basic_publish(exchange='', routing_key='prediction', body=data)
+                channel.basic_publish(exchange='', routing_key='trafic', body=pkt)
             else:
                 continue
-    
-
-            
+                        
 
 
 def main():
@@ -87,7 +106,7 @@ def main():
 
     data_collect = PacketCapture(
             "packet capture packet_dict",
-            queues.sharedQ,
+            queues.sharedQ
         )
     data_c_p = data_collect.start()
 
@@ -105,33 +124,37 @@ def main():
     time_counts = TimesAndCounts(
         "time the packets",
         queues.timesQ,
-        queues.featuresQ
+        queues.featuresQ,
+        queues.logQ
     )
     time_c_p = time_counts.start()
 
-    queue = Queue()
-    p1 = multiprocessing.Process(target=predictor, args=(queues.featuresQ,queues.predictQ))
+
+    p1 = multiprocessing.Process(target=predictor, args=(queues.featuresQ, queues.logQ))
     p1.start()
 
-    #socketio = SocketIO(app, cors_allowed_origins="*")
-    
-    """@socketio.on('connected')
-    def sender(data):
-        print(data)
+    #p2 = multiprocessing.Process(target=log, args=(queues.logQ,))
+    #p2.start()
 
-    socketio.run(app, debug=True)
-    app.run(debug=True)"""
+
 
 
 
 # driver function
 if __name__ == '__main__':
-    # creating a Flask app
-    #pp = Flask(__name__)
-    # create a Socket.IO server
-    #CORS(app)
 
     connection = pika.BlockingConnection(pika.URLParameters('amqps://lhauzmcm:qFCFZ54NC5F6qaLSc0tgFoM9PZZjU0RI@jackal.rmq.cloudamqp.com/lhauzmcm'))
     channel = connection.channel()
+
+
+    from pymongo import MongoClient
+    try:
+        client = MongoClient("mongodb://localhost:27017")
+        print("Connected")
+    except:
+        print("error")
+
+    db = client["Safeguard"]
+    logs=db["logs"]
 
     main()

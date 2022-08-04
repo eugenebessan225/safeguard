@@ -43,6 +43,7 @@ class PacketAnalyse(multiprocessing.Process):
         self.inQ = inQ
         self.outQ = outQ
         self.dvar = datasetSummary()
+        
 
     def run(self):
         start_timer = time.perf_counter()

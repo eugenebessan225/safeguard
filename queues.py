@@ -19,3 +19,6 @@ featuresQ = mp.Queue()
 
 global predictQ
 predictQ = mp.Queue()
+
+global logQ
+logQ = mp.Queue()

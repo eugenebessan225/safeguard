@@ -1,0 +1,16 @@
+2022-08-02 10:10:27,016 {'Time': '2022-08-02T10:10:26.442170316Z', 'Protocol': 'TCP', 'Source': '7.185.176.120', 'Destination': '192.168.38.64', 'P_src': '43394', 'P_dst': '80', 'event': 'Dos'}
+2022-08-02 10:10:28,882 {'Time': '2022-08-02T10:10:26.945894914Z', 'Protocol': 'TCP', 'Source': '186.24.188.105', 'Destination': '192.168.38.64', 'P_src': '47757', 'P_dst': '80', 'event': 'Dos'}
+2022-08-02 10:10:31,434 {'Time': '2022-08-02T10:10:27.442291882Z', 'Protocol': 'TCP', 'Source': '194.41.228.124', 'Destination': '192.168.38.64', 'P_src': '54569', 'P_dst': '80', 'event': 'Dos'}
+2022-08-02 10:10:34,261 {'Time': '2022-08-02T10:10:27.957238793Z', 'Protocol': 'TCP', 'Source': '93.50.105.233', 'Destination': '192.168.38.64', 'P_src': '62300', 'P_dst': '80', 'event': 'Dos'}
+2022-08-02 10:10:34,263 {'Time': '2022-08-02T10:10:27.957261869Z', 'Protocol': 'TCP', 'Source': '192.168.38.64', 'Destination': '93.50.105.233', 'P_src': '80', 'P_dst': '62300', 'event': 'Dos'}
+2022-08-02 10:10:36,658 {'Time': '2022-08-02T10:10:28.445402853Z', 'Protocol': 'TCP', 'Source': '150.143.201.41', 'Destination': '192.168.38.64', 'P_src': '3332', 'P_dst': '80', 'event': 'Dos'}
+2022-08-02 10:10:39,163 {'Time': '2022-08-02T10:10:28.947741776Z', 'Protocol': 'TCP', 'Source': '150.73.50.87', 'Destination': '192.168.38.64', 'P_src': '10430', 'P_dst': '80', 'event': 'Dos'}
+2022-08-02 10:10:39,959 {'Time': '2022-08-02T10:10:38.902497644Z', 'Protocol': 'TCP', 'Source': '192.168.38.64', 'Destination': '34.213.44.137', 'P_src': '40002', 'P_dst': '443', 'event': 'Dos'}
+2022-08-02 10:11:43,686 Connection is idle, 1 stale byte intervals
+2022-08-02 10:11:43,687 Aborting transport connection: state=1; <ssl.SSLSocket fd=18, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('192.168.38.64', 39688), raddr=('54.207.152.68', 5671)>
+2022-08-02 10:11:43,687 _AsyncTransportBase._initate_abort(): Initiating abrupt asynchronous transport shutdown: state=1; error=None; <ssl.SSLSocket fd=18, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('192.168.38.64', 39688), raddr=('54.207.152.68', 5671)>
+2022-08-02 10:11:43,687 Deactivating transport: state=1; <ssl.SSLSocket fd=18, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('192.168.38.64', 39688), raddr=('54.207.152.68', 5671)>
+2022-08-02 10:11:43,687 AMQP stack terminated, failed to connect, or aborted: opened=True, error-arg=None; pending-error=AMQPHeartbeatTimeout: ('No activity or too many missed heartbeats in the last 120 seconds',)
+2022-08-02 10:11:43,688 Stack terminated due to AMQPHeartbeatTimeout: ('No activity or too many missed heartbeats in the last 120 seconds',)
+2022-08-02 10:11:43,688 Closing transport socket and unlinking: state=3; <ssl.SSLSocket fd=18, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('192.168.38.64', 39688), raddr=('54.207.152.68', 5671)>
+2022-08-02 10:11:43,689 Unexpected connection close detected: AMQPHeartbeatTimeout: ('No activity or too many missed heartbeats in the last 120 seconds',)

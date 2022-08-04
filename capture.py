@@ -4,6 +4,8 @@ import subprocess
 import json
 import time
 
+from grpc import Channel
+
 
 
 
@@ -15,6 +17,7 @@ class PacketCapture(multiprocessing.Process):
         multiprocessing.Process.__init__(self)
         self.name = name
         self.outQ = outQ
+        self.log = {}
         
         # This is a global foo_foo_ to foo. keymap that is shared across all packets
         self.keymap = {}

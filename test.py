@@ -1,5 +1,7 @@
-X = {'nom':'eugene', 'taille':'2'}
+"""X = {'nom':'eugene', 'taille':'2'}
+
+print(X)
+print("***************")
+print(type(str(X)))"""
 
 
-for i in X.values():
-    print(i)
